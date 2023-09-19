@@ -1,72 +1,135 @@
 const logger = require("../utils/logger.utils");
 const loggerInstance = require("../utils/loggerInstance.utils");
+require('dotenv').config();
 
-const listLogger = logger("silly", loggerInstance, "LIST");
+const listLogger = logger(
+    process.env.LOGGER_LEVEL, 
+    loggerInstance, 
+    "LIST BUTTON"
+    );
 
 module.exports = {
-    makeListOptions(
-        titleList,
-        pagesNumber,
-        currentPage,
+    async makeListOptions (
+        list,
+        pages,
+        page,
         type
     ) {
-        if (
-            titleList.length < 1 ||
-            !Number.isInteger(pagesNumber) ||
-            !Number.isInteger(currentPage) 
-        ) {
-            listLogger.error("Incorrect data");
-            return Error;
+        try {
+            const buttons = [];
+
+            const objectsList = await this._createObjectsList (
+                list,
+                type
+            );
+            const pagesList = await this._createPagesList (
+                page, 
+                pages, 
+                type
+            );
+            const navigationList = await this._createNavigationList (
+                page,
+                pages,
+                type
+            )
+    
+            for(let i = 0; i < objectsList.length; i++) {
+                buttons.push(objectsList[i]);
+            };
+            buttons.push(pagesList);
+            buttons.push(navigationList);
+
+            const options = await this._createOptionsJSON(buttons)
+
+            return options;
+        } catch (error) {
+            listLogger.error(error);
         }
+    },
 
-        const buttons = [];
+    async _createObjectsList (list, type) {
+        try {
+            const buttons = [];
 
-        if (titleList != -1 && titleList.length > 0) {
-            for (let i = 0; i < titleList.length; i++) {
+            for (let i = 0; i < list.length; i++) {
                 buttons.push([{
-                    text: `${titleList[i].name}`,
-                    callback_data: `${titleList[i].id}_l_${type}`
+                    text: `${list[i].name}`,
+                    callback_data: `${list[i].id}_l_${type}`
                 }]);
             }
-        }
 
-        buttons.push([]);
-        if (pagesNumber != -1) {
-            for (let i = 1; i <= pagesNumber; i++) {
-                if (i != currentPage) {
-                    buttons[buttons.length-1].push({
+            return buttons;
+        } catch (error) {
+            listLogger.error(error);
+        }
+    },
+
+    async _createPagesList (
+        page, 
+        pages, 
+        type
+    ) {
+        try {
+            const buttons = [];
+
+            for (let i = 1; i <= pages; i++) {
+                if (i != page) {
+                    buttons.push({
                         text: `${i}`,
                         callback_data: `${i}_p_${type}`
                     });
                 } else {
-                    buttons[buttons.length-1].push({
+                    buttons.push({
                         text: `[${i}]`,
                         callback_data: `${i}_p_${type}`
                     });
                 }
             }
-        }
 
-        buttons.push([]);
-        if (currentPage > 1) {
-            buttons[buttons.length-1].push({
-                text: `Назад   `,
-                callback_data: `${currentPage-1}_p_${type}`
-            });
+            return buttons;
+        } catch (error) {
+            listLogger.error(error);
         }
-        if (currentPage < pagesNumber) {
-            buttons[buttons.length-1].push({
-                text: `   Далі`,
-                callback_data: `${currentPage+1}_p_${type}`
-            });
-        }
+    },
 
-        const options = {
-            reply_markup: JSON.stringify({
-                inline_keyboard: buttons
-            })
-        }
+    async _createNavigationList (
+        page,
+        pages,
+        type
+    ) {
+        try {
+            const buttons = [];
 
-        return options;
+            if (page > 1) {
+                buttons.push({
+                    text: `Назад   `,
+                    callback_data: `${page-1}_p_${type}`
+                });
+            }
+            if (page < pages) {
+                buttons.push({
+                    text: `   Далі`,
+                    callback_data: `${page+1}_p_${type}`
+                });
+            }
+
+            return buttons;
+        } catch (error) {
+            listLogger.error(error);
+        }
+    },
+
+    async _createOptionsJSON (buttonsObject) {
+        try {
+            const buttonsJSON = {
+                reply_markup: JSON.stringify({
+                    inline_keyboard: buttonsObject
+                })
+            }
+
+            return buttonsJSON;
+        } catch (error) {
+            listLogger.error(error);
+        }
     }
 }

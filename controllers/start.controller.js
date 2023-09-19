@@ -1,17 +1,21 @@
+const StartScrapper = require("../scrappers/start.scrappers");
 const logger = require("../utils/logger.utils");
 const loggerInstance = require("../utils/loggerInstance.utils");
+require('dotenv').config();
 
-const startLogger = logger("silly", loggerInstance, "START");
+const startLogger = logger(
+    process.env.LOGGER_LEVEL, 
+    loggerInstance, 
+    "START"
+);
 
 module.exports = {
-    async StartController(msg, bot) {
-        startLogger.debug(msg);
+    async setStart (msg, bot) {
+        startLogger.silly(msg);
         startLogger.info(`User ${msg.chat.first_name} ${msg.chat.last_name} (${msg.chat.id}) started bot`);
-        await bot.sendMessage(msg.chat.id, `Вітаю, ${msg.chat.first_name}!\n "Бла-бла-бла"`);
+        const startMessage = await StartScrapper.createStartOptions(msg.chat.first_name);
+        startLogger.debug(startMessage);
 
-        bot.on('callback_query', msg => {
-            startLogger.debug(msg);
-            //bot.sendMessage(msg.message.chat.id, `Selected button ${msg.data}`);
-        })
+        return bot.sendMessage(msg.chat.id, startMessage.startInfo, startMessage.startForm);
     }
 }
