@@ -12,7 +12,7 @@ const objectLogger = logger(
 module.exports = {
     async createObjectDetails (id) {
         try {
-            const object = await this._getObjectData(id);
+            const object = await this._getObject(id);
 
             return object;
         } catch (error) {
