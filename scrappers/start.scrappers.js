@@ -7,7 +7,7 @@ const startLogger = logger(
     process.env.LOGGER_LEVEL, 
     loggerInstance, 
     "START SCRAPPER"
-    );
+);
 
 module.exports = {
     async createStartOptions (name) {

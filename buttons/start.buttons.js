@@ -6,7 +6,7 @@ const startLogger = logger(
     process.env.LOGGER_LEVEL, 
     loggerInstance, 
     "START BUTTON"
-    );
+);
 
 module.exports = {
     async makeStartOptions () {

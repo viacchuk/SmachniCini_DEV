@@ -17,10 +17,14 @@ module.exports = async function fetcher(to, params = {}) {
         }
     }
 
-    fetcherLogger.debug(JSON.stringify({
-        key: process.env.API_DEV,
-        ...params
-    }));
+    fetcherLogger.debug(
+        `Request to: ${process.env.API_URL + to}\n`, 
+        `headers: "Content-Type": "application/json"\n`,
+        `body: ${JSON.stringify({
+            key: process.env.API_DEV,
+            ...params
+        })}`
+    );
 
     const res = await fetch(
         process.env.API_URL + to, 

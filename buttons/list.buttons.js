@@ -6,7 +6,7 @@ const listLogger = logger(
     process.env.LOGGER_LEVEL, 
     loggerInstance, 
     "LIST BUTTON"
-    );
+);
 
 module.exports = {
     async makeListOptions (
@@ -72,7 +72,20 @@ module.exports = {
         try {
             const buttons = [];
 
-            for (let i = 1; i <= pages; i++) {
+            let start = 1;
+            let end = 7;
+
+            if (page > 5) {
+                start = page - 3;
+                end = page + 3;
+            }
+
+            if (page > pages - 6) {
+                start = pages - 6;
+                end = pages;
+            }
+
+            for (let i = start; i <= end; i++) {
                 if (i != page) {
                     buttons.push({
                         text: `${i}`,
@@ -83,6 +96,20 @@ module.exports = {
                         text: `[${i}]`,
                         callback_data: `${i}_p_${type}`
                     });
+                }
+            }
+
+            if (page > 5) {
+                buttons[0] = {
+                    text: `1...`,
+                    callback_data: `$1_p_${type}`
+                }
+            }
+
+            if (page != pages) {
+                buttons[6] = {
+                    text: `...${pages}`,
+                    callback_data: `${pages}_p_${type}`
                 }
             }
 
@@ -102,13 +129,13 @@ module.exports = {
 
             if (page > 1) {
                 buttons.push({
-                    text: `Назад   `,
+                    text: `◀️ Назад   `,
                     callback_data: `${page-1}_p_${type}`
                 });
             }
             if (page < pages) {
                 buttons.push({
-                    text: `   Далі`,
+                    text: `   Далі ▶️`,
                     callback_data: `${page+1}_p_${type}`
                 });
             }

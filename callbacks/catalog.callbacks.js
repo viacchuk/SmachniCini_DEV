@@ -1,4 +1,4 @@
-
+const { makeCashOptions } = require("../buttons/object.buttons");
 const CatalogController = require("../controllers/catalog.controller");
 const ObjectScrappers = require("../scrappers/catalog.object.scrappers");
 const logger = require("../utils/logger.utils");
@@ -28,8 +28,10 @@ module.exports = {
             if (callback.data.split("_")[1] === "l") {
                 const objectID = parseInt(callback.data.split("_")[0]);
                 const object = await ObjectScrappers.createObjectDetails(objectID);
+                const objectButton = await makeCashOptions(objectID);
 
-                return bot.sendMessage(callback.message.chat.id, object.info);
+                await bot.sendMediaGroup(callback.message.chat.id, object.media);
+                return bot.sendMessage(callback.message.chat.id, object.text, objectButton);
             }
 
         } catch (error) {
